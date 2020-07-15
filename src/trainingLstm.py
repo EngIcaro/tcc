@@ -23,7 +23,7 @@ def saveHist(path,history):
         json.dump(new_hist, f, separators=(',', ':'), sort_keys=True, indent=4)
 
 #%%
-layer1 = "[40]"
+layer1 = "[120]"
 layer2 = "[0]"
 for j in range(1,9):
     fold = j
@@ -85,7 +85,7 @@ for j in range(1,9):
     # o parâmetro return_sequences significa que ele vai passar o resultado para frente  para as próximas camadas
     # no input_shape dizemos como é a nossa entrada. temos seis entradas atrasadas ou amostrada em 20 segundos
     # return_sequences retornam a saída do estado oculto para cada etapa do tempo de entrada.
-    regressor.add(LSTM(units = 40, input_shape = (previsores.shape[1],5)))
+    regressor.add(LSTM(units = 120, input_shape = (previsores.shape[1],5)))
     # Vamos criar a camada de saída 
     regressor.add(Dense(units = 1, activation = 'linear'))
     # Vamos compilar a rede
@@ -115,7 +115,7 @@ for j in range(1,9):
         json_file.write(regressor_json)
     
 #%%
-layer1 = "[60]"
+layer1 = "[120]"
 layer2 = "[0]"
 loss     = []
 val_loss = []
@@ -151,12 +151,20 @@ for i in range(54):
     mean_loss.append(((loss[0][i] + loss[1][i] + loss[2][i] + loss[3][i] + loss[4][i] + loss[5][i] + loss[6][i] + loss[7][i])/8))
     mean_val_loss.append(((val_loss[0][i] + val_loss[1][i] + val_loss[2][i] + val_loss[3][i] + val_loss[4][i] + val_loss[5][i] + val_loss[6][i] + val_loss[7][i])/8))
 
+# [20]  loss:  0.00021475384475721964 val_loss:  0.0003580329082225011
+# [40]  loss:  0.00018430440648161583 val_loss:  0.00035274376467227427
+# [60]  loss:  0.0001709627847466579 val_loss:  0.0003448472388969988 
+# [80]  loss:  0.00017612955664197461 val_loss:  0.0003979238771730797
+# [100] loss:  0.00017088620032451626 val_loss:  0.0003666541448380695
+# [120] loss:  0.00016974342573062545 val_loss:  0.00035729431673206166  
+print("loss: ", mean_loss[65], "val_loss: ", mean_val_loss[65])
 fig = plt.figure(figsize=(8,6))
 ax1=fig.add_subplot(1, 1, 1)
-ax1.plot(mean_loss)
-ax1.plot(mean_val_loss)
-ax1.set_ylabel("Erro Quadrático Médio", fontsize = 13)
+ax1.plot(mean_loss, label = "Treinamento")
+ax1.plot(mean_val_loss, label = "Validação")
+ax1.set_ylabel("Média do Erro Quadrático Médio", fontsize = 13)
 ax1.set_xlabel("Épocas", fontsize = 13)
+plt.legend()
 #%% Lendo a base de treinamento
 
 base_input = pd.read_csv(r'./../kfold/trainingInput.csv')

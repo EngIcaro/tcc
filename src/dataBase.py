@@ -11,8 +11,11 @@ def heatmap():
     base = pd.read_csv(r'./../dados/1_10.csv')
     base = base.drop('DIRECAO', 1)
     base = base.drop('CHUVA', 1)
-    base.columns = ['DATA', 'TEMP_AMBIENTE', 'PRESSÃO', 'UMIDADE', 'IRRADIÂNCIA', 'VELOCIDADE', 'TEMP_PAINEL', 'TENSÃO', 'CORRENTE']
-    plt.figure(figsize=(5, 7)) 
+    base['POTENCIA'] = base['TENSAO']*base['CORRENTE']
+    base = base.drop('TENSAO', 1)
+    base = base.drop('CORRENTE', 1)
+    base.columns = ['DATA', 'TEMP_AMBIENTE', 'PRESSÃO', 'UMIDADE', 'IRRADIÂNCIA', 'VELOCIDADE', 'TEMP_PAINEL', 'POTÊNCIA']
+    plt.figure(figsize=(8, 6)) 
     mask = np.zeros_like(base.corr())
     mask[np.triu_indices_from(mask)] = True
     sns.heatmap(base.corr(),
@@ -49,27 +52,35 @@ def creatDataBase1(path, variablesInput,variablesOutput,testDay, fold):
         ##print("passando aqui,", csv_file.isnull().any())
         # Vai retirar valores negativos de todas as variáveis e setar para 0
         indexAux = csv_file[(csv_file['TENSAO'] < 0)].index
+        print('TEN', indexAux)
         csv_file['TENSAO'][indexAux] = 0
     
         indexAux = csv_file[(csv_file['CORRENTE'] < 0)].index
+        print('CORR', indexAux)
         csv_file['CORRENTE'][indexAux] = 0
         
         indexAux = csv_file[(csv_file['TEMPERATURA'] < 0)].index
+        print('TEMP', indexAux)
         csv_file['TEMPERATURA'][indexAux] = 0
     
         indexAux = csv_file[(csv_file['PRESSAO'] < 0)].index  
+        print('PRES', indexAux)
         csv_file['PRESSAO'][indexAux] = 0 
 
         indexAux = csv_file[(csv_file['IRRADIANCIA'] < 0)].index
+        print('IRRA', indexAux)
         csv_file['IRRADIANCIA'][indexAux] = 0 
     
         indexAux = csv_file[(csv_file['TEMP_PAINEL'] < 0)].index 
+        print('TEMP_PAI', indexAux)
         csv_file['TEMP_PAINEL'][indexAux] = 0
     
         indexAux = csv_file[(csv_file['VELOCIDADE'] < 0)].index 
+        print('VELO', indexAux)
         csv_file['VELOCIDADE'][indexAux] = 0
         
         indexAux = csv_file[(csv_file['UMIDADE'] < 0)].index 
+        print('UMIDA', indexAux)
         csv_file['UMIDADE'][indexAux] = 0
         # Criando a coluna potência
         csv_file['POTENCIA'] = csv_file['TENSAO']*csv_file['CORRENTE']
@@ -183,21 +194,45 @@ t = np.arange(0, len(val), 1)
 times=np.array([datetime.datetime(2019, 9, 27, int(p/3600), int((p/60)%60), int(p%60)) for p in t])
 fmtr = dates.DateFormatter("%H:%M")
 
-fig = plt.figure(figsize=(8,8))
+fig = plt.figure(figsize=(7,3))
+ax1=fig.add_subplot(1, 1, 1)
+ax1.plot(times, base['TENSAO'])
+ax1.set_ylabel("Volts", fontsize = 12)
+ax1.xaxis.set_major_formatter(fmtr)
+ax1.set_xlabel("Hora", fontsize = 12)
+plt.title("Tensão", fontsize = 12)
+plt.grid()
+#%%
+fig = plt.figure(figsize=(7,3))
+ax2=fig.add_subplot(1, 1, 1)
+ax2.plot(times, base['CORRENTE'])
+ax2.set_ylabel("Ampere", fontsize = 12)
+ax2.xaxis.set_major_formatter(fmtr)
+ax2.set_xlabel("Hora", fontsize = 12)
+plt.title("Corrente", fontsize = 12)
+plt.grid()
+#%%
+ax3=fig.add_subplot(3, 1, 3)
+ax3.plot(times, (base['TENSAO']*base['CORRENTE']))
+ax3.set_ylabel("Watts", fontsize = 12)
+ax3.xaxis.set_major_formatter(fmtr)
+ax3.set_xlabel("Hora", fontsize = 12)
+plt.title("Potência", fontsize = 12)
+plt.grid()
+#%%
+fig = plt.figure(figsize=(8,5))
 ax1=fig.add_subplot(3, 1, 1)
 ax1.plot(times, base['TENSAO'])
 ax1.set_ylabel("Volts", fontsize = 12)
 ax1.xaxis.set_major_formatter(fmtr)
 plt.title("Tensão", fontsize = 12)
 plt.grid()
-
 ax2=fig.add_subplot(3, 1, 2)
 ax2.plot(times, base['CORRENTE'])
 ax2.set_ylabel("Ampere", fontsize = 12)
 ax2.xaxis.set_major_formatter(fmtr)
 plt.title("Corrente", fontsize = 12)
 plt.grid()
-
 ax3=fig.add_subplot(3, 1, 3)
 ax3.plot(times, (base['TENSAO']*base['CORRENTE']))
 ax3.set_ylabel("Watts", fontsize = 12)

@@ -83,7 +83,7 @@ t = np.arange(0, len(saidas), 1)
 times=np.array([datetime.datetime(2019, 9, 27, int(p/3600), int((p/60)%60), int(p%60)) for p in t])
 fmtr = dates.DateFormatter("%H:%M")
 
-fig = plt.figure(figsize=(13,8))
+fig = plt.figure(figsize=(11,5))
 ax1 = fig.add_subplot(1, 1, 1)
 ax1.plot(times,saidas[:,0],linestyle='-',color= 'red',label = 'Potência Real', linewidth=1)
 ax1.plot(times,previsoes[:,0],linestyle='--', color= 'royalblue', label = 'Potência Prevista', linewidth=1,dashes=(1, 2))
@@ -107,7 +107,7 @@ np.save(r'./../saidas/errorPotencia', diff)
 #%%
 errorPotencia   = np.load(r'./../saidas/errorPotencia.npy')
 # Create a figure instance
-fig = plt.figure(1, figsize=(9, 6))
+fig = plt.figure(1, figsize=(4, 4))
 # Create an axes instance
 ax = fig.add_subplot(111)
 # Remove outliers showfliers=False
