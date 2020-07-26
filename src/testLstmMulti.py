@@ -84,6 +84,17 @@ for i in range(5):
 plt.plot(step, mae, 'bo')
 plt.xticks(range(1, 6))
 #%%
+import statistics 
+dp = []
+sub = saidas[:,0] - previsoes[:,0]
+for i in range(5):
+    dp.append(statistics.stdev(saidas[:,i] - previsoes[:,i]))
+    print("step = ", (i+1), "dp = ", statistics.stdev(saidas[:,i] - previsoes[:,i]))
+
+
+
+
+#%%
 diff = []
 for i in range(len(saidas[:,0])):
    diff.append(abs(previsoes[i,:] - saidas[i,:]))
